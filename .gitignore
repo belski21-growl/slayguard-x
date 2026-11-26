@@ -1,0 +1,11 @@
+out/
+cache/
+__pycache__/
+*.pyc
+video/*
+!video/slayguard-x-demo.mp4
+!video/vo-script.md
+!video/*.py
+!video/*.sh
+tapeout/tapekit/
+tapeout/viperx/
