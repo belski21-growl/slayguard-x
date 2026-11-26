@@ -267,11 +267,16 @@ def main():
         if snap:
             draw_terminal(d, snap)
         save(img)
-    # close card
-    close = draw_card(["Audit before you click."],
-                      ["SlayGuard X  ·  OKX Build X",
-                       "Registry 0x55b9…42e5 — X Layer mainnet",
-                       "GitHub repo — not yet pushed"], GREEN)
+    # close card — sub-lines overridable via env SLAY_CLOSE_SUBS (JSON list),
+    # e.g. for the no-tapeout variant (repo pushed, no circuit ID claim).
+    # Default = original card ("GitHub repo — not yet pushed").
+    import json as _json
+    _close_subs = _json.loads(os.environ["SLAY_CLOSE_SUBS"]) \
+        if os.environ.get("SLAY_CLOSE_SUBS") else \
+        ["SlayGuard X  ·  OKX Build X",
+         "Registry 0x55b9…42e5 — X Layer mainnet",
+         "GitHub repo — not yet pushed"]
+    close = draw_card(["Audit before you click."], _close_subs, GREEN)
     for _ in range(CLOSE_S * FPS):
         save(close)
 
