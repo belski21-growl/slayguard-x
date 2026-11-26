@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SlayGuard AI — Cek Kontrak Sebelum Kamu Klik</title>
+<title>SlayGuard AI — Check the Contract Before You Click</title>
 <style>
   :root { color-scheme: light dark; }
   body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
@@ -25,47 +25,47 @@
 </head>
 <body>
 <h1>🛡️ SlayGuard <span>X</span></h1>
-<p class="sub">Cek keamanan smart contract EVM <b>sebelum</b> kamu mint / approve / beli — kini di <b>X Layer</b> + TapeOut. Read-only — tanpa wallet, tanpa gas.</p>
+<p class="sub">Check the security of an EVM smart contract <b>before</b> you mint / approve / buy — now on <b>X Layer</b> + TapeOut. Read-only — no wallet, no gas.</p>
 <form id="f">
-  <input type="text" id="addr" placeholder="0x… alamat kontrak" required minlength="42" maxlength="42">
+  <input type="text" id="addr" placeholder="0x… contract address" required minlength="42" maxlength="42">
   <select id="chain"><option value="bsc">BSC</option><option value="eth">Ethereum</option><option value="xlayer">X Layer (196)</option><option value="xlayer-testnet">X Layer Testnet (1952)</option></select>
   <button type="submit">Audit</button>
 </form>
-<div class="card" id="tapeout"><b>TapeOut (X Layer mainnet):</b> <span class="muted">memuat status on-chain…</span></div>
-<div class="card" id="circuit"><b>Risk Circuit (NAND netlist):</b> <span class="muted">memuat verifikasi…</span></div>
-<p class="muted">Contoh: WBNB di BSC <code>0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c</code> — klik contoh buat isi otomatis.</p>
+<div class="card" id="tapeout"><b>TapeOut (X Layer mainnet):</b> <span class="muted">loading on-chain status…</span></div>
+<div class="card" id="circuit"><b>Risk Circuit (NAND netlist):</b> <span class="muted">loading verification…</span></div>
+<p class="muted">Example: WBNB on BSC <code>0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c</code> — click the example to fill it in automatically.</p>
 <div id="out"></div>
 <script>
 const $ = s => document.querySelector(s);
 async function loadPanels() {
   try {
     const t = await (await fetch('/api/tapeout')).json();
-    $('#tapeout').innerHTML = `<b>TapeOut (X Layer mainnet):</b> factory ${t.factory_live ? 'LIVE' : 'MATI'} (${t.factory_code_bytes ?? '?'} byte) · market ${t.market_live ? 'LIVE' : 'MATI'} (${t.market_code_bytes ?? '?'} byte) · blok ${t.block_number ?? '?'} · chain ${t.chain_id ?? '?'}`;
-  } catch (e) { $('#tapeout').innerHTML = '<b>TapeOut:</b> gagal baca RPC X Layer (cek koneksi).'; }
+    $('#tapeout').innerHTML = `<b>TapeOut (X Layer mainnet):</b> factory ${t.factory_live ? 'LIVE' : 'OFFLINE'} (${t.factory_code_bytes ?? '?'} bytes) · market ${t.market_live ? 'LIVE' : 'OFFLINE'} (${t.market_code_bytes ?? '?'} bytes) · block ${t.block_number ?? '?'} · chain ${t.chain_id ?? '?'}`;
+  } catch (e) { $('#tapeout').innerHTML = '<b>TapeOut:</b> failed to read X Layer RPC (check connection).'; }
   try {
     const c = await (await fetch('/api/circuit')).json();
-    $('#circuit').innerHTML = `<b>Risk Circuit (NAND netlist):</b> ${c.gate_count} gerbang NAND, depth ${c.depth} · terverifikasi exhaustif ${c.verified_exhaustive_inputs}/256 kombinasi input (${c.verified_ok ? 'LOLOS' : 'GAGAL'}) · tape-out mainnet: menunggu persetujuan biaya.`;
-  } catch (e) { $('#circuit').innerHTML = '<b>Risk Circuit:</b> gagal muat netlist.'; }
+    $('#circuit').innerHTML = `<b>Risk Circuit (NAND netlist):</b> ${c.gate_count} NAND gates, depth ${c.depth} · exhaustively verified ${c.verified_exhaustive_inputs}/256 input combinations (${c.verified_ok ? 'PASS' : 'FAIL'}) · tape-out mainnet: awaiting fee approval.`;
+  } catch (e) { $('#circuit').innerHTML = '<b>Risk Circuit:</b> failed to load netlist.'; }
 }
 loadPanels();
 document.querySelector('code').onclick = () => { $('#addr').value = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'; };
 $('#f').onsubmit = async e => {
   e.preventDefault();
   const out = $('#out');
-  out.innerHTML = '<p>Audit on-chain… (baca bytecode + state, ~5–15 dtk)</p>';
+  out.innerHTML = '<p>Auditing on-chain… (reading bytecode + state, ~5–15 s)</p>';
   try {
     const r = await fetch('/api/audit', { method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ address: $('#addr').value.trim(), chain: $('#chain').value }) });
     const d = await r.json();
     if (!r.ok) { out.innerHTML = `<div class="card high"><b>Error:</b> ${d.error}</div>`; return; }
     const meta = Object.entries(d.meta || {}).map(([k,v]) => `<div><b>${k}:</b> ${v}</div>`).join('');
-    const finds = (d.findings || []).map(f => `<div class="card ${f.severity}"><span class="sev">${f.severity} −${f.points} pts</span><br><b>${f.title}</b><br>${f.detail}</div>`).join('') || '<p>Tidak ada temuan.</p>';
+    const finds = (d.findings || []).map(f => `<div class="card ${f.severity}"><span class="sev">${f.severity} −${f.points} pts</span><br><b>${f.title}</b><br>${f.detail}</div>`).join('') || '<p>No findings.</p>';
     out.innerHTML = `
       <p><span class="verdict ${d.verdict}">${d.verdict}</span> <span class="score">${d.score}/100</span></p>
-      <div class="card"><b>Penjelasan AI (${d.explanation_mode === 'llm' ? 'LLM' : 'heuristik'}):</b><br>${d.explanation}</div>
+      <div class="card"><b>AI explanation (${d.explanation_mode === 'llm' ? 'LLM' : 'heuristic'}):</b><br>${d.explanation}</div>
       <div class="meta">${meta}</div>
-      <h3>Temuan (${(d.findings||[]).length})</h3>${finds}
-      <p class="muted">SlayGuard bukan nasihat finansial. Selalu DYOR — verdict ini dari data on-chain publik saat audit.</p>`;
+      <h3>Findings (${(d.findings||[]).length})</h3>${finds}
+      <p class="muted">SlayGuard is not financial advice. Always DYOR — this verdict comes from public on-chain data at audit time.</p>`;
   } catch (err) { out.innerHTML = `<div class="card high"><b>Error:</b> ${err}</div>`; }
 };
 </script>

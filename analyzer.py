@@ -76,12 +76,12 @@ SELECTORS = {
 
 # Risky / owner-power selectors: (key, label, severity, points)
 RISKY_FUNCS = [
-    ("pause()", "Owner bisa pause kontrak (trading/mint bisa dibekukan)", "medium", 10),
-    ("setBaseURI(string)", "Owner bisa ganti metadata/URI semua token", "medium", 10),
-    ("withdraw()", "Owner bisa tarik dana dari kontrak", "medium", 10),
-    ("upgradeTo(address)", "Proxy bisa di-upgrade — logika bisa diganti total", "high", 25),
-    ("mint(address,uint256)", "Owner bisa mint token baru tanpa batas terlihat", "low", 5),
-    ("mint(uint256)", "Fungsi mint publik/terbuka", "low", 5),
+    ("pause()", "Owner can pause the contract (trading/minting can be frozen)", "medium", 10),
+    ("setBaseURI(string)", "Owner can change the metadata/URI of all tokens", "medium", 10),
+    ("withdraw()", "Owner can withdraw funds from the contract", "medium", 10),
+    ("upgradeTo(address)", "Proxy can be upgraded — logic can be replaced entirely", "high", 25),
+    ("mint(address,uint256)", "Owner can mint new tokens with no visible cap", "low", 5),
+    ("mint(uint256)", "Public/open mint function", "low", 5),
 ]
 
 ADDRESS_RE = re.compile(r"^0x[0-9a-fA-F]{40}$")
@@ -105,7 +105,7 @@ def rpc_call(chain, method, params, timeout=15):
             last_err = data.get("error", data)
         except Exception as e:  # noqa: BLE001 - try next endpoint
             last_err = str(e)
-    raise RuntimeError(f"RPC {chain} gagal di semua endpoint: {last_err}")
+    raise RuntimeError(f"RPC {chain} failed on all endpoints: {last_err}")
 
 
 def _decode_string(hexdata):
@@ -151,7 +151,7 @@ def tapeout_status(chain="xlayer"):
     TapeOut circuits, contracts, ATAU onchain data di X Layer).
     """
     if chain not in ("xlayer", "xlayer-testnet"):
-        raise ValueError("tapeout_status hanya untuk xlayer / xlayer-testnet")
+        raise ValueError("tapeout_status only supports xlayer / xlayer-testnet")
     out = {"chain": chain}
     try:
         out["chain_id"] = int(rpc_call(chain, "eth_chainId", []), 16)
@@ -192,10 +192,10 @@ def gas_price_gwei(chain):
 def analyze(address, chain="bsc"):
     """Full audit. Returns dict with verdict, score (0-100, higher = safer), findings."""
     if chain not in RPCS:
-        raise ValueError(f"chain tidak didukung: {chain} "
-                         "(pilih bsc / eth / xlayer / xlayer-testnet)")
+        raise ValueError(f"Unsupported chain: {chain} "
+                         "(choose bsc / eth / xlayer / xlayer-testnet)")
     if not ADDRESS_RE.match(address):
-        raise ValueError("alamat tidak valid (harus 0x + 40 hex)")
+        raise ValueError("Invalid address (must be 0x + 40 hex)")
 
     addr = address.lower()
     findings = []
@@ -213,9 +213,9 @@ def analyze(address, chain="bsc"):
         return {"address": address, "chain": chain, "score": 0,
                 "verdict": "HOLD",
                 "findings": [{"severity": "high", "points": 100,
-                              "title": "Bukan kontrak — ini alamat wallet (EOA)",
-                              "detail": "Tidak ada bytecode di alamat ini. "
-                                        "Jangan kirim dana/mint ke sini."}],
+                              "title": "Not a contract — this is a wallet address (EOA)",
+                              "detail": "No bytecode at this address. "
+                                        "Do not send funds/mint here."}],
                 "meta": {}}
     code_len = (len(code) - 2) // 2
     meta = {"bytecode_bytes": code_len}
@@ -227,9 +227,9 @@ def analyze(address, chain="bsc"):
         if slot and int(slot, 16) != 0:
             impl = "0x" + slot[-40:]
             meta["proxy_implementation"] = impl
-            add("medium", 15, "Kontrak proxy (EIP-1967)",
-                f"Logika ada di implementasi {impl}. "
-                "Admin proxy bisa ganti logika — cek siapa adminnya.")
+            add("medium", 15, "Proxy contract (EIP-1967)",
+                f"Logic lives in the implementation {impl}. "
+                "The proxy admin can change the logic — check who the admin is.")
     except Exception:
         pass
 
@@ -258,12 +258,12 @@ def analyze(address, chain="bsc"):
             if owner:
                 meta["owner"] = owner
                 if owner == "0x0000000000000000000000000000000000000000":
-                    add("low", 0, "Ownership sudah renounced",
-                        "owner() = alamat nol — tidak ada yang bisa ubah kontrak. Bagus.")
+                    add("low", 0, "Ownership already renounced",
+                        "owner() = zero address — nobody can change the contract. Good.")
                     meta["renounced"] = True
                 else:
-                    add("info", 0, "Owner terdeteksi",
-                        f"Owner: {owner}. Cek apakah owner ini EOA / multisig / tim dikenal.")
+                    add("info", 0, "Owner detected",
+                        f"Owner: {owner}. Check whether this owner is an EOA / multisig / known team.")
         except Exception:
             pass
     else:
@@ -276,10 +276,10 @@ def analyze(address, chain="bsc"):
         if sel in code_body:
             # mint tanpa owner() terdeteksi = lebih berisiko (publik)
             if fn in ("mint(address,uint256)", "mint(uint256)") and not meta.get("owner"):
-                add("medium", 10, label + " (tanpa owner terdeteksi)",
-                    "Fungsi mint ada tapi tidak ada owner() — mint mungkin terbuka untuk umum.")
+                add("medium", 10, label + " (no owner detected)",
+                    "Mint function exists but there is no owner() — mint may be open to everyone.")
             else:
-                add(sev, pts, label, f"Selector 0x{sel} ditemukan di bytecode.")
+                add(sev, pts, label, f"Selector 0x{sel} found in bytecode.")
 
     # 5. maxSupply
     for fn in ("maxSupply()", "MAX_SUPPLY()"):
@@ -293,8 +293,8 @@ def analyze(address, chain="bsc"):
                         pct = meta["total_supply"] / ms * 100
                         meta["minted_pct"] = round(pct, 1)
                         if pct >= 99:
-                            add("high", 20, "Supply hampir habis",
-                                f"{pct:.1f}% dari max supply sudah ter-mint.")
+                            add("high", 20, "Supply almost exhausted",
+                                f"{pct:.1f}% of max supply already minted.")
             except Exception:
                 pass
             break

@@ -76,11 +76,11 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError as e:
             self._send(400, json.dumps({"error": str(e)}))
         except Exception as e:  # noqa: BLE001
-            self._send(500, json.dumps({"error": f"audit gagal: {type(e).__name__}: {e}"}))
+            self._send(500, json.dumps({"error": f"audit failed: {type(e).__name__}: {e}"}))
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8765"))
     srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"SlayGuard AI jalan di http://127.0.0.1:{port}")
+    print(f"SlayGuard AI running at http://127.0.0.1:{port}")
     srv.serve_forever()

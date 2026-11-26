@@ -1,64 +1,65 @@
 # SlayGuard X — OKX Build X / X Layer TapeOut Accelerate
 
-**Satu kalimat:** SlayGuard AI (audit kontrak EVM buat orang awam) diadaptasi ke
-X Layer + TapeOut — verdict GO/CAUTION/HOLD yang sama kini bisa diverifikasi
-lewat data on-chain TapeOut, dihitung ulang oleh Risk Circuit NAND, dan
-dicatat permanen di registry on-chain.
+**One sentence:** SlayGuard AI (EVM contract auditing for everyday users) adapted to
+X Layer + TapeOut — the same GO/CAUTION/HOLD verdict can now be verified
+through TapeOut on-chain data, recomputed by a NAND Risk Circuit, and
+recorded permanently in an on-chain registry.
 
-## Ide + kenapa bisa menang (1 paragraf)
+## Idea + why it can win (1 paragraph)
 
-Tim ini tiap hari audit kontrak BSC pakai skill audit EVM, tapi user biasa
-nggak punya skill itu — satu klik mint/approve yang salah bisa nguras wallet.
-SlayGuard X ngubah workflow audit internal tim jadi produk publik untuk X
-Layer: mesin heuristik baca bytecode + state on-chain (tanpa private key,
-tanpa gas), LLM yang nerjemahin temuan jadi bahasa manusia, panel TapeOut
-live (factory + market X Layer mainnet), Risk Circuit NAND yang meng-encode
-aturan verdict sehingga verdict bisa dihitung on-chain ala TapeOut (bukan
-cuma klaim off-chain), dan SlayGuardRegistry yang mencatat tiap verdict di
-X Layer biar bisa dicek siapa pun. Ini nyentuh semua kriteria juri sekaligus:
-user value nyata (melindungi pengguna X Layer yang jumlahnya tumbuh bareng
-OKX), inovasi (audit AI + circuit on-chain), integrasi ekosistem (TapeOut
-onchain data + circuit + rencana DeWEB), dan product readiness (produk sudah
-jalan, bukan mockup — cuma nambah chain + komponen on-chain baru).
+This team audits BSC contracts every day using EVM audit skills, but ordinary
+users don't have those skills — one wrong mint/approve click can drain a wallet.
+SlayGuard X turns the team's internal audit workflow into a public product for X
+Layer: a heuristic engine that reads bytecode + on-chain state (no private key,
+no gas), an LLM that translates findings into human language, a live TapeOut
+panel (factory + market on X Layer mainnet), a NAND Risk Circuit that encodes
+the verdict rules so the verdict can be computed on-chain TapeOut-style (not
+just an off-chain claim), and SlayGuardRegistry that records every verdict on
+X Layer so anyone can check it. It hits every judging criterion at once:
+real user value (protecting X Layer users, whose numbers grow with OKX),
+innovation (audit AI + on-chain circuit), ecosystem integration (TapeOut
+on-chain data + circuit + DeWEB plans), and product readiness (the product
+already works, not a mockup — only the chain + new on-chain components were
+added).
 
-## Sinergi SlayGuard — keputusan: YA, ADAPTASI (bukan fresh build)
+## SlayGuard synergy — decision: YES, ADAPT (not a fresh build)
 
-Alasan: aturan OKX membolehkan proyek lama **asal ada pengembangan baru yang
-substansial selama event, dan hanya kerjaan event yang dinilai**. Yang baru di
-SlayGuard X (semua dikerjakan 25 Nov 2026, dalam periode event):
-1. Chain baru: X Layer mainnet (196) + testnet (1952) — RPC, gas OKB, UI.
-2. Integrasi TapeOut onchain data: baca live factory + market di mainnet
-   (read-only, gratis) — memenuhi syarat "circuits, contracts, OR onchain
-   data" (FAQ resmi: interface/komputasi boleh off-chain, asal dijelaskan
-   bagian mana yang pakai TapeOut).
-3. Risk Circuit NAND baru (46 gerbang, depth 15, terverifikasi exhaustif
-   256/256 kombinasi input) — artefak tape-out siap submit.
-4. SlayGuardRegistry (kontrak Solidity baru) — verdict tercatat on-chain.
-5. Endpoint + UI baru: `/api/tapeout`, `/api/circuit`, `/api/gasprice`.
-Yang dipakai ulang dari SlayGuard asli: mesin heuristik analyzer + server +
-UI dasar. Itu fondasi, bukan entry-nya — semua nilai TapeOut/X Layer adalah
-baru. Risiko juri menganggap "cuma ganti chain": dimitigasi dengan circuit +
-registry yang nyata-nyata baru dan terverifikasi.
+Reason: the OKX rules allow existing projects **as long as there is substantial
+new development during the event, and only work done during the event is judged**.
+What's new in SlayGuard X (all done 25 Nov 2026, inside the event period):
+1. New chain: X Layer mainnet (196) + testnet (1952) — RPC, OKB gas, UI.
+2. TapeOut on-chain data integration: live reads of factory + market on mainnet
+   (read-only, free) — satisfies the "circuits, contracts, OR on-chain data"
+   requirement (official FAQ: interface/computation may run off-chain, as long as
+   it is explained which part uses TapeOut).
+3. New NAND Risk Circuit (46 gates, depth 15, exhaustively verified
+   256/256 input combinations) — tape-out artifact ready to submit.
+4. SlayGuardRegistry (new Solidity contract) — verdicts recorded on-chain.
+5. New endpoints + UI: `/api/tapeout`, `/api/circuit`, `/api/gasprice`.
+Reused from the original SlayGuard: the analyzer heuristic engine + server +
+basic UI. That is the foundation, not the entry — all the TapeOut/X Layer value is
+new. Risk of judges seeing it as "just a chain swap": mitigated by the circuit +
+registry, which are genuinely new and verified.
 
-## Struktur repo
+## Repo structure
 
-- `analyzer.py` — audit heuristik (BSC/ETH/X Layer/testnet) + `tapeout_status()`
-- `app.py` — server stdlib; `/api/audit`, `/api/tapeout`, `/api/circuit`, `/api/gasprice`
-- `circuit/risk_circuit.py` — netlist NAND Risk Circuit + verifier exhaustif
-- `contracts/SlayGuardRegistry.sol` — registry verdict on-chain
-- `test/SlayGuardRegistry.t.sol` — forge test (tanpa forge-std)
-- `tests/` — unittest Python + `live_e2e_xlayer.py` (read-only, butuh network)
-- `scripts/e2e_local.sh` — E2E lokal lengkap (tanpa network eksternal)
-- `static/index.html` — UI (chain X Layer + panel TapeOut + panel circuit)
+- `analyzer.py` — heuristic audit (BSC/ETH/X Layer/testnet) + `tapeout_status()`
+- `app.py` — stdlib server; `/api/audit`, `/api/tapeout`, `/api/circuit`, `/api/gasprice`
+- `circuit/risk_circuit.py` — NAND Risk Circuit netlist + exhaustive verifier
+- `contracts/SlayGuardRegistry.sol` — on-chain verdict registry
+- `test/SlayGuardRegistry.t.sol` — forge test (no forge-std)
+- `tests/` — Python unittests + `live_e2e_xlayer.py` (read-only, needs network)
+- `scripts/e2e_local.sh` — full local E2E (no external network)
+- `static/index.html` — UI (X Layer chain + TapeOut panel + circuit panel)
 
-## Cara run
+## How to run
 
 ```bash
 cd ~/workspace/scratch/okx-buildx
 python3 app.py            # http://127.0.0.1:8765
 ```
 
-Mode AI (opsional, key dari env, tidak pernah di-hardcode):
+AI mode (optional, key from env, never hardcoded):
 ```bash
 export SLAY_LLM_BASE_URL="https://api.100milionseek.com/v1"
 export SLAY_LLM_API_KEY="..."
@@ -66,89 +67,89 @@ export SLAY_LLM_MODEL="deepseek-v4.1-flash-free"
 python3 app.py
 ```
 
-## Tes (hasil 25 Nov 2026 ~06:00 WIB)
+## Tests (results 25 Nov 2026 ~06:00 WIB)
 
 ```bash
-forge test -vv --gas-report        # 5/5 PASS (kontrak)
+forge test -vv --gas-report        # 5/5 PASS (contract)
 python3 -m unittest discover -s tests   # 11/11 PASS (circuit + analyzer)
-bash scripts/e2e_local.sh          # E2E LOKAL: PASS
-python3 tests/live_e2e_xlayer.py   # LIVE read-only — PENDING approval egress (lihat Blocker)
+bash scripts/e2e_local.sh          # LOCAL E2E: PASS
+python3 tests/live_e2e_xlayer.py   # LIVE read-only — PENDING egress approval (see Blocker)
 ```
 
-E2E lokal: deploy + record + baca balik dibuktikan via `forge test`
-(EVM in-process); app lawan anvil lokal via `anvil_setCode`
-(audit dummy: CAUTION 65, 2 temuan — benar: upgradeTo −25, mint tanpa
-owner −10). Tx submit via anvil di VM ini gagal "Insufficient funds" walau
-saldo 10.000 ETH (quirk anvil/forge 1.9.0 di VM) — bukan bug kontrak.
+Local E2E: deploy + record + read-back proven via `forge test`
+(in-process EVM); app against local anvil via `anvil_setCode`
+(dummy audit: CAUTION 65, 2 findings — correct: upgradeTo −25, mint without
+owner −10). Tx submission via anvil on this VM fails "Insufficient funds" even
+with a 10,000 ETH balance (anvil/forge 1.9.0 quirk on this VM) — not a contract bug.
 
-## Angka gas terukur (forge --gas-report)
+## Measured gas numbers (forge --gas-report)
 
-| Aksi | Gas |
+| Action | Gas |
 |---|---|
-| Deploy SlayGuardRegistry | 680.947 |
-| recordAudit pertama (cold) | ~116.149 |
-| recordAudit berikutnya (warm) | ~22.867 |
+| Deploy SlayGuardRegistry | 680,947 |
+| First recordAudit (cold) | ~116,149 |
+| Later recordAudit (warm) | ~22,867 |
 
-## Estimasi biaya mainnet X Layer (OKB ≈ $82, 24 Nov 2026, OKX)
+## Mainnet X Layer cost estimate (OKB ≈ $82, 24 Nov 2026, OKX)
 
-| Aksi | @1 gwei | @10 gwei | @100 gwei |
+| Action | @1 gwei | @10 gwei | @100 gwei |
 |---|---|---|---|
-| Deploy registry | 0,000681 OKB ≈ **$0,06** | ≈ $0,56 | ≈ $5,59 |
-| recordAudit pertama | ≈ $0,01 | ≈ $0,10 | ≈ $0,95 |
+| Deploy registry | 0.000681 OKB ≈ **$0.06** | ≈ $0.56 | ≈ $5.59 |
+| First recordAudit | ≈ $0.01 | ≈ $0.10 | ≈ $0.95 |
 
-Gas price live X Layer belum dibaca (butuh egress — pending); docs OKX
-bilang gas X Layer "negligible". **TIDAK ADA deploy mainnet tanpa
-persetujuan user.** Tape-out Risk Circuit ke factory mainnet: biaya
-BELUM DIKETAHUI (butuh ABI + fungsi biaya factory — lihat Blocker).
+Live X Layer gas price not yet read (needs egress — pending); OKX docs
+say X Layer gas is "negligible". **NO mainnet deploy without
+user approval.** Tape-out of the Risk Circuit to the mainnet factory: cost
+NOT YET KNOWN (needs factory ABI + fee function — see Blocker).
 
-## Testnet (gratis, tapi butuh langkah manual)
+## Testnet (free, but needs manual steps)
 
 - X Layer testnet: chain 1952, RPC `https://testrpc.xlayer.tech/terigon`,
-  faucet resmi `web3.okx.com/xlayer/faucet` (0,2 OKB/hari, klaim via browser).
-- Deploy testnet butuh: (1) user klaim faucet ke alamat deployer,
-  (2) deployer key diserahkan via jalur aman (BUKAN chat) — koordinator/user
-  yang putuskan. Sampai itu ada, bukti deploy = `forge test` + anvil lokal.
+  official faucet `web3.okx.com/xlayer/faucet` (0.2 OKB/day, claim via browser).
+- Testnet deploy needs: (1) user claims the faucet to the deployer address,
+  (2) deployer key handed over via a secure channel (NOT chat) — coordinator/user
+  decide. Until then, deploy proof = `forge test` + local anvil.
 
-## Rencana demo video (≤3 menit)
+## Demo video plan (≤3 minutes)
 
-- 0:00–0:20 Masalah: 1 klik mint/approve salah bisa nguras wallet.
-- 0:20–0:50 Live audit kontrak X Layer → verdict + penjelasan bahasa manusia.
-- 0:50–1:20 Panel TapeOut live + Risk Circuit NAND (46 gerbang, 256/256).
-- 1:20–1:50 Registry: verdict tercatat on-chain, bisa dicek siapa pun.
-- 1:50–2:40 Target user + revenue: freemium (audit gratis; Pro report + API
-  berbayar; B2B wallet/marketplace X Layer).
-- 2:40–3:00 Penutup: repo + link demo + apa yang baru selama event.
+- 0:00–0:20 Problem: 1 wrong mint/approve click can drain a wallet.
+- 0:20–0:50 Live audit of an X Layer contract → verdict + human-language explanation.
+- 0:50–1:20 Live TapeOut panel + NAND Risk Circuit (46 gates, 256/256).
+- 1:20–1:50 Registry: verdict recorded on-chain, checkable by anyone.
+- 1:50–2:40 Target users + revenue: freemium (free audits; paid Pro reports + API;
+  B2B for X Layer wallets/marketplaces).
+- 2:40–3:00 Close: repo + demo link + what is new during the event.
 
-## Docs yang dipelajari
+## Docs studied
 
-- OKX Build X (resmi): https://web3.okx.com/xlayer/build-x-series
-- X Layer dev docs (resmi): https://web3.okx.com/onchainos/dev-docs/xlayer/developer/build-on-xlayer/about-xlayer
-- X Layer testnet faucet (resmi): https://web3.okx.com/onchainos/dev-docs/xlayer/developer/bridge/get-testnet-okb-from-faucet
+- OKX Build X (official): https://web3.okx.com/xlayer/build-x-series
+- X Layer dev docs (official): https://web3.okx.com/onchainos/dev-docs/xlayer/developer/build-on-xlayer/about-xlayer
+- X Layer testnet faucet (official): https://web3.okx.com/onchainos/dev-docs/xlayer/developer/bridge/get-testnet-okb-from-faucet
 - TapeOut beginner's guide v1.5: https://tapeoutdaily.ai/downloads/tapeout-complete-beginners-guide-v1.5-en.pdf
 - TapeOut ecosystem reference: https://tape4fun.com/en/index.html
-- TapeKit repo (resmi): https://github.com/TapeOutProtocol/TapeKit
-- ViperX docs (preseden: 4 risk circuit TapeOut di X Layer mainnet, factory
-  hanya ada di mainnet): https://docs.viperx.site/roadmap
+- TapeKit repo (official): https://github.com/TapeOutProtocol/TapeKit
+- ViperX docs (precedent: 4 risk circuits taped out on X Layer mainnet, factory
+  only exists on mainnet): https://docs.viperx.site/roadmap
 - TapeOut factory X Layer mainnet `0x1f09daefa827f02cbb40967cc91b259763760761`,
-  market `0xd89f358c48a7B632c9845af2a02A32eB90DD75DB` (dua sumber independen).
+  market `0xd89f358c48a7B632c9845af2a02A32eB90DD75DB` (two independent sources).
 
-## Blocker / yang belum terverifikasi live
+## Blockers / not yet verified live
 
-1. **Egress VM ke RPC publik kena approval card (timeout, tidak terjawab).**
-   Akibat: `tapeout_status()` live, `gasPrice` live, dan audit 1 kontrak
-   X Layer mainnet nyata BELUM terbukti dari VM ini. Perlu: approval egress
-   ATAU jalankan `tests/live_e2e_xlayer.py` dari Simular box / tempat lain.
-2. **Faucet + deploy testnet** butuh langkah manual user (klaim + key).
-3. **Biaya tape-out circuit** belum diketahui (butuh ABI factory / docs
-   TapeOut resmi — kemungkinan butuh browser task ke tapeout.build/canvas).
-4. OKX explorer 403 di `browser.open` — verifikasi alamat factory via
-   explorer belum bisa dari tool ini (alamat dikonfirmasi 2 sumber lain).
-5. DeWEB publish (TapeKit container) butuh tape-out mainnet juga — stretch
-   goal, bukan blocker submit (FAQ: interface tidak wajib on-chain).
+1. **VM egress to public RPCs hits an approval card (timeout, unanswered).**
+   Consequence: live `tapeout_status()`, live `gasPrice`, and auditing 1 real
+   X Layer mainnet contract are NOT yet proven from this VM. Needs: egress approval
+   OR run `tests/live_e2e_xlayer.py` from the Simular box / elsewhere.
+2. **Faucet + testnet deploy** need manual user steps (claim + key).
+3. **Tape-out circuit cost** not yet known (needs factory ABI / official TapeOut
+   docs — may need a browser task to tapeout.build/canvas).
+4. OKX explorer 403s in `browser.open` — factory address verification via
+   explorer not possible from this tool (address confirmed via 2 other sources).
+5. DeWEB publish (TapeKit container) also needs a mainnet tape-out — stretch
+   goal, not a submit blocker (FAQ: the interface does not have to be on-chain).
 
-## Submit (JANGAN submit — target siap 7 Des ~06:59 WIB)
+## Submit (DO NOT submit — target ready 7 Dec ~06:59 WIB)
 
-Butuh untuk form: deskripsi produk + target user + revenue model,
-alamat registry (testnet/mainnet), alamat factory + market TapeOut,
-circuit ID (setelah tape-out — atau netlist + bukti verifikasi bila
-tape-out tertunda), link demo, video ≤3 menit.
+Needed for the form: product description + target users + revenue model,
+registry address (testnet/mainnet), TapeOut factory + market addresses,
+circuit ID (after tape-out — or netlist + verification proof if
+tape-out is delayed), demo link, video ≤3 minutes.

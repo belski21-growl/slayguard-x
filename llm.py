@@ -19,13 +19,13 @@ def explain(result):
 
     verdict = result["verdict"]
     lines = [f"- [{f['severity']}] {f['title']}: {f['detail']}"
-             for f in result["findings"]] or ["- Tidak ada temuan."]
+             for f in result["findings"]] or ["- No findings."]
     prompt = (
-        "Kamu asisten keamanan smart contract. Jelaskan hasil audit ini ke pengguna "
-        "awam dalam Bahasa Indonesia, maks 6 kalimat pendek: apa risikonya, apa yang "
-        "aman, dan 1 aksi yang harus dilakukan sebelum interaksi.\n"
-        f"Alamat: {result['address']} ({result['chain']}), skor {result['score']}/100, "
-        f"verdict {verdict}.\nTemuan:\n" + "\n".join(lines)
+        "You are a smart contract security assistant. Explain this audit result to a lay user "
+        "in English, max 6 short sentences: what the risk is, what is safe, and 1 action to "
+        "take before interacting.\n"
+        f"Address: {result['address']} ({result['chain']}), score {result['score']}/100, "
+        f"verdict {verdict}.\nFindings:\n" + "\n".join(lines)
     )
     try:
         r = requests.post(f"{base}/chat/completions", json={
@@ -38,20 +38,20 @@ def explain(result):
         return text, "llm"
     except Exception as e:  # noqa: BLE001 - fallback aman
         t = _template(result)
-        return t + f"\n\n(LLM gagal: {type(e).__name__} — tampil penjelasan heuristik.)", "heuristic"
+        return t + f"\n\n(LLM failed: {type(e).__name__} — showing the heuristic explanation.)", "heuristic"
 
 
 def _template(result):
     v = result["verdict"]
     n = len(result["findings"])
     if v == "GO":
-        s = (f"Skor {result['score']}/100 — tidak ada temuan berisiko tinggi. "
-             "Kontrak ini terlihat aman untuk interaksi standar.")
+        s = (f"Score {result['score']}/100 — no high-risk findings. "
+             "This contract looks safe for standard interaction.")
     elif v == "CAUTION":
-        s = (f"Skor {result['score']}/100 — ada {n} temuan. Masih bisa interaksi, "
-             "tapi baca dulu temuan di bawah dan jangan approve tanpa batas.")
+        s = (f"Score {result['score']}/100 — {n} findings. You can still interact, "
+             "but read the findings below first and never approve without limits.")
     else:
-        s = (f"Skor {result['score']}/100 — HOLD. Ada risiko serius di temuan "
-             "di bawah. Jangan mint/approve sebelum risikonya jelas.")
-    s += " Aksi: cek owner & fungsi berbahaya di atas; kalau owner tidak dikenal, jangan lanjut."
+        s = (f"Score {result['score']}/100 — HOLD. There is serious risk in the findings "
+             "below. Do not mint/approve before the risk is clear.")
+    s += " Action: check the owner & dangerous functions above; if the owner is unknown, stop here."
     return s
