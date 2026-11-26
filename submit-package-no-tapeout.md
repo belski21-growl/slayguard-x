@@ -1,7 +1,7 @@
 # OKX Build X — Paket Submit OPSI TANPA TAPE-OUT (draft form)
 **Status:** DRAFT — siap isi ke form submit begitu user tonton video + OK dan video ter-upload ke YouTube.
 **Dibuat:** 26 Nov 2026 ~18:20 WIB. **Tape-out: BELUM dieksekusi (HOLD user 26 Nov ~16:40).**
-**Video opsi ini:** `video/slayguard-x-demo-no-tapeout.mp4` — 97,3 dtk, 1920x1080, h264+AAC, 1.613.042 byte (terverifikasi 26 Nov ~18:15: frame dicek 2/30/92/95 dtk, VO hadir 8/8 jendela, leak scan bersih).
+**Video opsi ini:** `video/slayguard-x-demo-no-tapeout-v2.mp4` — 97,3 dtk, 1920x1080, h264+AAC, 1.935.152 byte, full Inggris + eye-catching (v2, user-approved 26 Nov ~20:36; v1 diganti v2).
 **Deadline submit:** 7 Des 23:59 UTC = 8 Des 06:59 WIB (provisional, halaman resmi).
 
 ## 1. Deskripsi produk (isi form — dari README, tanpa angka baru)
@@ -25,7 +25,7 @@ Audit gratis untuk semua orang. Yang berbayar: laporan Pro (detail), API berbaya
 | TapeOut factory implementation (yang diaudit, EIP-1967 proxy) | `0x336e9f0f4c3fee7c8c803377e4dea00293f4ae2a` |
 | TapeOut market (mainnet) | `0xd89f358c48a7B632c9845af2a02A32eB90DD75DB` |
 | Repo GitHub (public, main) | https://github.com/belski21-growl/slayguard-x |
-| Video demo (≤3 menit) | [LINK YOUTUBE — isi setelah user upload] — file lokal: `video/slayguard-x-demo-no-tapeout.mp4` |
+| Video demo (≤3 menit) | https://youtu.be/k-E5g13plAM — file lokal: `video/slayguard-x-demo-no-tapeout-v2.mp4` (97,3 dtk, 1920x1080; di-upload 26 Nov ~20:48 WIB, Public, channel @belskiraizo, no copyright issue) |
 | Akses demo (app) | Repo README: `python3 app.py` → http://127.0.0.1:8765 (endpoint `/api/audit`, `/api/tapeout`, `/api/circuit`, `/api/gasprice`) |
 
 ## 5. Fitur TapeOut yang dipakai (penjelasan untuk form — syarat "circuits ATAU contracts ATAU onchain data")
@@ -54,6 +54,6 @@ Yang dipakai ulang dari SlayGuard asli: mesin heuristik analyzer + server + UI d
 - Live audit contoh: implementasi factory TapeOut → CAUTION 65/100 (upgradeTo −25, owner withdraw −10).
 
 ## 9. Sisa sebelum submit (checklist singkat)
-- [ ] User tonton video opsi ini + OK.
-- [ ] User upload video ke YouTube → isi link di §4.
+- [x] User tonton video opsi ini + OK. DONE 26 Nov ~20:36 (v2).
+- [x] User upload video ke YouTube → isi link di §4. DONE 26 Nov ~20:48: https://youtu.be/k-E5g13plAM (upload oleh parent via device browser atas perintah user "Lu aja yang upload", Public, no copyright issue).
 - [ ] Isi form submit OKX dengan draft di atas (tangan user/parent — JANGAN submit tanpa OK user).
